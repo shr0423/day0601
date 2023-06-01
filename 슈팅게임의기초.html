@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            margin: 0px;
+        }
+
+        #wrapper {
+            width: 100%;
+            height: 550px;
+            background-image: url(../images/game_bg.jpg);
+            background-size: 100% 550px;
+            position: relative;
+            overflow: hidden;
+        }
+    </style>
+    <script src="hero.js"></script>
+    <script src="./bullet.js"></script>
+    <script>
+        let wrapper;
+        let hero;
+        let bulletArray=[];
+
+        //주인공 생성하기 
+        function createHero() {
+            //constructor(container,src,x,y,width,height)
+            hero = new Hero(wrapper, "../images/plane.png", 0, 150, 80, 60);
+
+        }
+        function init() {
+            wrapper = document.getElementById("wrapper");
+            createHero();
+        }
+        //게임에 등장하는 물체가 현재 움직이던 움직이지 않던
+        //무조건 게임은 루프가 돌아야 한다..
+        function loop() {
+            hero.move();
+            //배열에 담겨진 총알수 만큼 move()
+            for(let i=0;i<bulletArray.length;i++){
+                bulletArray[i].move();
+            }
+        }
+        //우주선의 좌우를 결정짓는 함수
+        function moveX(n) {
+            hero.velX = n;
+
+        }
+        function moveY(n) {
+            hero.velY = n;
+        }
+        //총알을 생성하여 날리자
+        function fire(){
+           let b= new Bullet(wrapper,hero.x,hero.y,20,20,15,0);
+           //배열에 총알을 추가한다
+           bulletArray.push(b);
+        }
+
+        addEventListener("load", function () {
+            init();
+            setInterval("loop()", 10);
+            //주인공을 제어하기 위한 키보드 이벤트 연결
+            document.body.addEventListener("keydown", function () {
+                switch (event.keyCode) {
+                    case 37: moveX(-5); break; //좌측
+                    case 39: moveX(5); break;
+                    case 38: moveY(-5); break;
+                    case 40: moveY(5); break;
+                    case 32 : fire();break;// 발사
+                }
+
+            });
+
+            //손을 뗄때..
+            document.body.addEventListener("keyup", function () {
+                switch (event.keyCode) {
+                    case 37: moveX(0); break;
+                    case 39: moveX(0); break;
+                    case 38: moveY(0); break;
+                    case 40: moveY(0); break;
+                }
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <div id="wrapper"></div>
+</body>
+
+</html>

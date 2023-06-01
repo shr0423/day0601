@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #wrapper {
+            width: 700px;
+            height: 700px;
+            background: gray;
+        }
+
+        #header {
+            width: 100%;
+            height: 50px;
+            background: yellowgreen;
+            text-align: center;
+            font-size: 30px;
+            font-weight: bolder;
+        }
+
+        #day_title {
+            width: 100%;
+            height: 50px;
+            background: orange;
+            position: relative;
+        }
+
+        #content {
+            width: 100%;
+            height: 600px;
+            background: salmon;
+            position: relative;
+        }
+    </style>
+    <script src="./DayBox.js"></script>
+    <script src="../js/lib.js"></script>
+    <script src="./DateBox.js"></script>
+    <script>
+        let title;//연도,월
+        let day_title;//요일
+        let content;//날짜출력
+        let dayArray = ["일", "월", "화", "수", "목", "금", "토"];
+        let nowDate;//현재 날짜 또는 이전,다음 버튼으로 설정한 날짜
+        let boxArray = [];//7개짜리 일차원 배열을 여러개 담을 층에 해당하는
+        //이차원배열
+        let box;
+        //일~토요일 박스 생성
+        function createDay() {
+            for (let i = 0; i < 7; i++) {
+                new DayBox(day_title, i * 100, dayArray[i]);
+            }
+        }
+        function createDate() {
+            let n = 0;//셀의 순번(날짜자체가 아님!!!)
+
+            //현재 날짜 객체를 통해 현재 월이 무슨요일부터
+            //시작되는지 조사하자
+            //그 조사결과가 바로 num이 1씩 증가되는시점
+
+            for (let j = 0; j < 6; j++) {
+                //여기서 일차원배열선언
+                let arr = new Array(7);
+                for (let i = 0; i < 7; i++) {
+                    box = new DateBox(content, i * 100, j * 100, "", "gold");
+                    arr[i] = box;
+                    n++;
+                }
+                boxArray.push(arr);
+            }
+        }
+        //이전달출력
+        function prev() {
+            let month = nowDate.getMonth();
+            nowDate.setMonth(month - 1);
+            nowDate.setDate(1);
+            setTitle();
+            printDateNum(); 
+        }
+        //해당월의 마지막날 구하기(즉 해당월이 몇일까지인지..)
+        function getLastDateOfMonth(){
+            let year=nowDate.getFullYear();
+            let month=nowDate.getMonth();
+            let date=0;
+            let d=new Date(year,month+1,date);
+            return d.getDate();//일을 반환한다..
+        }
+        //이미 생성된 박수들에 날짜 출력
+        function printDateNum() {
+            let count=0;//무슨요일부터 날짜를 출력할지 결정짓는 카운터
+            let num = 0;//날짜역할의 변수
+
+            //현재 월이 무슨요일에서 시작되는지를 조사
+            let startDate=nowDate.getDay();
+            let lastDate=getLastDateOfMonth();
+
+            //alert((nowDate.getMonth()+1)+"월은"+dayArray[startDate]+"에서 시작해요");
+
+            for (let a = 0; a < boxArray.length; a++) {
+                for (let i = 0; i < boxArray[a].length; i++) {
+                    count++;
+                    if (count>startDate && num<lastDate) {//카운트를 세다가 해당카운트가 현재월의
+                        //1일의 요일을 넘어설때..
+                       
+                        num++;
+                        boxArray[a][i].div.innerText = num;
+                    }else{
+                        boxArray[a][i].div.innerText = "";
+                    }
+                }
+            }
+        }
+
+
+        //다음달 출력
+        function next() {
+            //현재 월을 1증가시키는 조작
+            let month = nowDate.getMonth();
+            nowDate.setMonth(month + 1);
+            nowDate.setDate(1);//해당월의 1일로 조작
+            //조작 후 출력
+            setTitle();
+            printDateNum();
+
+        }
+        function setTitle() {
+            //전역변수로 공유중인 nowDate만 쳐다보고 정보를 출력하자
+            let year = nowDate.getFullYear();
+            let month = nowDate.getMonth();
+
+            title.innerText = year + "년 " + (month + 1) + "월";//시각화할때는 +1하기
+
+        }
+        function init() {
+            title = document.getElementById("title");
+            day_title = document.getElementById("day_title");
+            content = document.getElementById("content");
+        }
+
+        addEventListener("load", function () {
+            init();
+            //현재날짜구하기
+            nowDate = new Date();
+            setTitle();
+            createDay();//요일박스생성
+            createDate();//날짜박스생성
+            printDateNum();
+        });
+    </script>
+</head>
+
+<body>
+    <div id="wrapper">
+        <div id="header">
+            <button onClick="prev()">◀</button>
+            <span id="title"></span>
+            <button onClick="next()">▶</button>
+        </div>
+        <div id="day_title"></div>
+        <div id="content"></div>
+    </div>
+</body>
+
+</html>
